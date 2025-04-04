@@ -62,7 +62,7 @@ student-tools-suite/
 │   └── assets/
 │       ├── icons/
 │       └── images/
-├── fonts/ (optional)     # For self-hosted fonts
+├── LICENCE
 └── README.md
 ```
 
