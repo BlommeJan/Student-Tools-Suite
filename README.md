@@ -81,6 +81,10 @@ student-tools-suite/
 
 ## 🚀 Getting Started
 
+just go to the website `studenttoolssuite.com` (not yet available)
+
+**or**
+
 1. Clone or download the repo
 2. Open `index.html` in your browser
 3. Navigate to any tool
