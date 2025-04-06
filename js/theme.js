@@ -17,13 +17,16 @@ const ACCENT_COLORS = [
     { name: 'Indigo', value: '#4F46E5' }
 ];
 
+// Initialize theme before DOM is loaded to prevent flash
+const savedTheme = localStorage.getItem(THEME_KEY) || DARK_THEME;
+const savedAccent = localStorage.getItem(ACCENT_COLOR_KEY) || DEFAULT_ACCENT;
+document.documentElement.className = savedTheme;
+document.documentElement.setAttribute('data-theme', savedTheme);
+
 // Initialize theme when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeTheme);
 
 export function initializeTheme() {
-    const savedTheme = localStorage.getItem(THEME_KEY) || DARK_THEME;
-    const savedAccent = localStorage.getItem(ACCENT_COLOR_KEY) || DEFAULT_ACCENT;
-    
     applyThemeColors(savedTheme, savedAccent);
     
     // Initialize settings button only if not already initialized
@@ -49,21 +52,10 @@ export function setAccentColor(color) {
 }
 
 function applyThemeColors(theme, accentColor) {
-    // Set theme attribute
+    // Set theme attribute and class
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.className = theme;
     
-    // Update body classes for theme
-    const body = document.body;
-    if (theme === DARK_THEME) {
-        body.classList.remove('bg-white', 'text-gray-800');
-        body.classList.add('bg-background', 'text-white');
-        document.documentElement.classList.add('dark');
-    } else {
-        body.classList.remove('bg-background', 'text-white');
-        body.classList.add('bg-white', 'text-gray-800');
-        document.documentElement.classList.remove('dark');
-    }
-
     // Apply CSS variables
     const colors = {
         [LIGHT_THEME]: {
@@ -106,7 +98,7 @@ async function setupSettingsModal() {
         const { createModal } = await import('./components/modal.js');
         
         oldSettingsBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || DARK_THEME;
+            const currentTheme = document.documentElement.className || DARK_THEME;
             const currentAccent = localStorage.getItem(ACCENT_COLOR_KEY) || DEFAULT_ACCENT;
             
             const modal = createModal({
@@ -177,20 +169,15 @@ async function setupSettingsModal() {
             const darkBtn = modal.querySelector('#theme-dark');
             
             function updateThemeButtons(theme) {
-                if (theme === LIGHT_THEME) {
-                    lightBtn.classList.add('active');
-                    darkBtn.classList.remove('active');
-                } else {
-                    darkBtn.classList.add('active');
-                    lightBtn.classList.remove('active');
-                }
+                lightBtn.classList.toggle('active', theme === LIGHT_THEME);
+                darkBtn.classList.toggle('active', theme === DARK_THEME);
             }
 
             [lightBtn, darkBtn].forEach(btn => {
                 btn.addEventListener('click', () => {
                     const isLight = btn.id === 'theme-light';
                     const newTheme = isLight ? LIGHT_THEME : DARK_THEME;
-                    if (document.documentElement.getAttribute('data-theme') !== newTheme) {
+                    if (document.documentElement.className !== newTheme) {
                         toggleTheme();
                         updateThemeButtons(newTheme);
                     }

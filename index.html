@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -44,7 +45,38 @@
     <style>
         :root {
             --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --glass-shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --glass-shadow-light: 0 4px 16px -1px rgba(15, 23, 42, 0.1);
+            --glass-shadow: var(--glass-shadow-dark);
+            --welcome-bg: rgba(0, 0, 0, 0.1);
+            --welcome-border: rgba(255, 255, 255, 0.1);
+            --welcome-text: #ffffff;
+        }
+
+        html.light {
+            --glass-shadow: var(--glass-shadow-light);
+            --welcome-bg: rgba(255, 255, 255, 0.7);
+            --welcome-border: rgba(15, 23, 42, 0.1);
+            --welcome-text: #1a202c;
+        }
+
+        /* Welcome Popup Styles */
+        .welcome-popup {
+            color: var(--welcome-text);
+            background: var(--welcome-bg);
+            border-color: var(--welcome-border);
+            transition: all 0.3s ease;
+        }
+
+        .welcome-popup .backdrop-blur-lg {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .welcome-popup .relative {
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .tool-icon {
@@ -72,7 +104,7 @@
         .tool-card:hover {
             transform: translateY(-5px);
             background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.15);
         }
 
         #settings-btn {
@@ -98,6 +130,38 @@
         #settings-btn:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: rotate(45deg);
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.12);
+        }
+
+        html.light .tool-card {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+        }
+
+        html.light .tool-card:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(15, 23, 42, 0.15);
+        }
+
+        html.light #settings-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+        }
+
+        html.light #settings-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(15, 23, 42, 0.15);
+        }
+
+        /* Prevent theme flash */
+        html.dark body {
+            background-color: #12181f;
+            color: #ffffff;
+        }
+
+        html.light body {
+            background-color: #ffffff;
+            color: #1a202c;
         }
     </style>
     
@@ -107,7 +171,7 @@
     <script type="module" src="js/utils.js"></script>
     <script type="module" src="js/alerts.js"></script>
 </head>
-<body class="font-lexend bg-background min-h-screen text-white">
+<body class="font-lexend min-h-screen">
     <button id="settings-btn" class="text-2xl">
         <i class="fas fa-cog"></i>
     </button>
