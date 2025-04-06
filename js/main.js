@@ -2,6 +2,7 @@
 import { initializeTheme, toggleTheme } from './theme.js';
 import { initializeAlerts, showAlert } from './alerts.js';
 import { initializeModals } from './components/modal.js';
+import { showWelcomePopup } from './components/welcome.js';
 
 // Main initialization script
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize any active modals
     initializeModals();
+
+    // Show welcome popup when the page loads
+    showWelcomePopup();
 });
 
 // Global error handler
