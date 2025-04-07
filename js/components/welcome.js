@@ -70,27 +70,25 @@ export function showWelcomePopup() {
                 <!-- Settings Notice -->
                 <div class="mb-8">
                     <p class="text-sm">
-                        <i class="fas fa-lightbulb text-accent"></i>
+                        <i class="fas fa-lightbulb text"></i>
                         <strong>Pro tip:</strong> Use the settings button <i class="fas fa-cog"></i> in the top-right corner to customize the theme and accent colors to your preference.
                     </p>
                 </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="p-6 border-t border-white/10 bg-black/5">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <label class="flex items-center gap-2 text-sm order-last sm:order-first">
-                        <input type="checkbox" id="welcome-dont-show" class="rounded border-white/20 bg-white/10">
-                        Don't show this again
-                    </label>
-                    <div class="flex gap-3 w-full sm:w-auto">
-                        <button id="welcome-remind" class="px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-all flex-1 sm:flex-initial">
-                            Remind Me Later
-                        </button>
-                        <button id="welcome-agree" class="px-4 py-2 rounded-lg bg-accent hover:bg-accent/90 transition-all flex-1 sm:flex-initial">
-                            Agree & Continue
-                        </button>
-                    </div>
+            <div class="flex justify-between items-center px-6 h-16 border-t border-white/10 bg-black/5">
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="dont-show-again" class="rounded border-gray-300 text-accent focus:ring-accent">
+                    <label for="dont-show-again" class="text-sm">Don't show this again</label>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="remind-later" class="px-6 h-10 rounded-lg bg-opacity-20 hover:bg-opacity-30 transition-all">
+                        Remind Me Later
+                    </button>
+                    <button id="agree-continue" class="px-6 h-10 rounded-lg" style="background-color: var(--accent-color);">
+                        Agree & Continue
+                    </button>
                 </div>
             </div>
         </div>
@@ -100,9 +98,9 @@ export function showWelcomePopup() {
     document.body.appendChild(popup);
 
     // Handle button clicks
-    const agreeBtn = popup.querySelector('#welcome-agree');
-    const remindBtn = popup.querySelector('#welcome-remind');
-    const dontShowCheckbox = popup.querySelector('#welcome-dont-show');
+    const agreeBtn = popup.querySelector('#agree-continue');
+    const remindBtn = popup.querySelector('#remind-later');
+    const dontShowCheckbox = popup.querySelector('#dont-show-again');
 
     function closePopup() {
         popup.classList.add('opacity-0');
