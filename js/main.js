@@ -1,6 +1,6 @@
 // Import dependencies
 import { initializeTheme, toggleTheme } from './theme.js';
-import { initializeAlerts, showAlert } from './alerts.js';
+import { initializeAlerts, showAlert } from './components/alerts.js';
 import { initializeModals } from './components/modal.js';
 import { showWelcomePopup } from './components/welcome.js';
 

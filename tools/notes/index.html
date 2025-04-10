@@ -1,1 +1,569 @@
-  
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Student Tools Suite</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.0/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'title': ['EB Garamond', 'serif'],
+                    },
+                    colors: {
+                        'accent': 'var(--accent-color)',
+                        'primary': 'var(--primary-color)',
+                        'background': {
+                            light: '#ffffff',
+                            dark: '#1a1a1a'
+                        },
+                        'surface': {
+                            light: '#f5f5f5',
+                            dark: '#2a2a2a'
+                        },
+                        'text': {
+                            light: {
+                                DEFAULT: '#1a1a1a',
+                                secondary: '#4a4a4a'
+                            },
+                            dark: {
+                                DEFAULT: '#ffffff',
+                                secondary: '#a0a0a0'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --accent-color: #7c3aed;
+            --primary-color: #2a2a2a;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --accent-hover: #6d28d9;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --background-color: #ffffff;
+            --surface-color: #f5f5f5;
+        }
+        
+        .dark {
+            color-scheme: dark;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-hover: #8b5cf6;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --background-color: #1a1a1a;
+            --surface-color: #2a2a2a;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+        }
+
+        /* Simple editor styles */
+        .note-editor {
+            height: 100%;
+            outline: none;
+            font-family: 'Lexend Deca', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            padding-right: 1rem;
+            min-height: 200px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .note-editor::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .note-editor::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .note-editor::-webkit-scrollbar-thumb {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+        
+        .note-editor::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .note-editor:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+        
+        .note-editor[contenteditable="true"] {
+            cursor: text;
+        }
+        
+        .note-editor p {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .note-editor h1, .note-editor h2, .note-editor h3 {
+            margin: 1.5rem 0 1rem;
+            font-family: 'Lexend Deca', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .note-editor h1 { font-size: 2rem; }
+        .note-editor h2 { font-size: 1.5rem; }
+        .note-editor h3 { font-size: 1.25rem; }
+        
+        .note-editor ul, .note-editor ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+            color: var(--text-primary);
+        }
+        
+        .note-editor ul {
+            list-style-type: disc;
+        }
+        
+        .note-editor ol {
+            list-style-type: decimal;
+        }
+        
+        .note-editor blockquote {
+            border-left: 4px solid var(--accent);
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            background-color: var(--surface-color);
+        }
+        
+        .note-editor code {
+            background-color: var(--surface-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            color: var(--text-primary);
+        }
+        
+        .note-editor pre {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+        
+        .note-editor pre code {
+            background-color: transparent;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        /* Glassmorphic Styles */
+        .kebab-menu-content {
+            background: var(--surface-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .kebab-menu-content {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hover Effects */
+        .tool-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-link::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 0, 0, 0.05),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .dark .tool-link::after {
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+        }
+
+        .tool-link:hover::after {
+            left: 100%;
+        }
+
+        /* Custom Scrollbar */
+        #sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--accent);
+            border-radius: 3px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kebab-menu-content {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Input and button styles */
+        input, button, select {
+            color: var(--text-primary);
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Modal styles */
+        .modal-content {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Note card styles */
+        .note-card {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar styles */
+        #sidebar {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+        }
+
+        .sidebar-header {
+            background-color: var(--surface-color);
+            border-color: var(--border-color);
+        }
+
+        /* Topbar styles */
+        .topbar {
+            background-color: var(--surface-color);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Format buttons */
+        .format-btn {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .format-btn:hover {
+            background-color: var(--surface-color);
+        }
+
+        /* Code block styles */
+        .note-editor code {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+        }
+
+        .note-editor pre {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Blockquote styles */
+        .note-editor blockquote {
+            border-left-color: var(--accent-color);
+            background-color: var(--surface-color);
+        }
+    </style>
+</head>
+<body class="bg-background text-text min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-surface/80 backdrop-blur-xl text-text w-64 fixed h-full z-10 -translate-x-full md:translate-x-0 border-r border-white/10">
+            <!-- Header -->
+            <div class="p-4 border-b border-white/10 backdrop-blur-sm bg-white/5">
+                <a href="/" class="block">
+                    <h1 class="text-2xl font-title font-bold text-accent">Student Tools Suite</h1>
+                </a>
+            </div>
+            
+            <!-- Favorites Section -->
+            <div class="px-4 py-3">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-text-secondary mb-2 flex items-center">
+                    <i class="fas fa-star text-accent mr-2"></i>Favorites
+                </h2>
+                <ul id="favorites-list" class="space-y-1">
+                    <!-- Favorites will be populated by sidebar.js -->
+                </ul>
+            </div>
+            
+            <!-- Tools Section -->
+            <div class="px-4 py-2">
+                <button id="show-more-btn" class="flex items-center text-sm text-text-secondary hover:text-text transition-colors mb-2 group">
+                    <span class="flex items-center">
+                        <i class="fas fa-chevron-down mr-2 transform transition-transform group-data-[expanded=true]:rotate-180"></i>
+                        Show More
+                    </span>
+                </button>
+                <ul id="tools-list" class="hidden space-y-1">
+                    <!-- Tools list will be populated by sidebar.js -->
+                </ul>
+            </div>
+            
+            <!-- Settings -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 backdrop-blur-sm bg-white/5">
+                <button id="settings-btn" class="w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:text-text hover:bg-white/10 transition-all">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-surface/80 backdrop-blur-xl hover:bg-white/10 transition-all border border-white/10">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 overflow-hidden">
+            <!-- Topbar -->
+            <div class="bg-surface border-b border-white/10 p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-xl font-bold">Notes 📝</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="new-note-btn" class="px-4 py-2 rounded-lg bg-accent hover:bg-opacity-90 transition-all">
+                        <i class="fas fa-plus mr-2"></i>New Note
+                    </button>
+                    <button id="import-btn" class="px-4 py-2 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                        <i class="fas fa-file-import mr-2"></i>Import
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notes Dashboard -->
+            <div id="notes-dashboard" class="p-6 h-[calc(100vh-64px)] overflow-y-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Notes will be populated by notes.js -->
+                </div>
+            </div>
+            
+            <!-- Editor View (hidden by default) -->
+            <div id="editor-view" class="hidden h-[calc(100vh-64px)]">
+                <div class="h-full flex flex-col p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-4">
+                            <button id="back-to-dashboard" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                                <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <h2 id="current-note-title" class="text-xl font-bold"></h2>
+                            <span id="current-note-tag" class="px-2 py-1 rounded-full text-xs bg-accent text-white"></span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex space-x-2">
+                                <button id="format-bold" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button id="format-italic" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button id="format-underline" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="format-h1" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Heading 1">
+                                    <i class="fas fa-heading"></i>1
+                                </button>
+                                <button id="format-h2" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Heading 2">
+                                    <i class="fas fa-heading"></i>2
+                                </button>
+                                <button id="format-h3" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Heading 3">
+                                    <i class="fas fa-heading"></i>3
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="format-list" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Bullet List">
+                                    <i class="fas fa-list-ul"></i>
+                                </button>
+                                <button id="format-numbered-list" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Numbered List">
+                                    <i class="fas fa-list-ol"></i>
+                                </button>
+                                <button id="format-quote" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Quote">
+                                    <i class="fas fa-quote-right"></i>
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="format-code" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Inline Code">
+                                    <i class="fas fa-code"></i>
+                                </button>
+                                <button id="format-code-block" class="px-3 py-1 rounded-lg bg-surface hover:bg-white/5 transition-all" title="Code Block">
+                                    <i class="fas fa-file-code"></i>
+                                </button>
+                            </div>
+                            <button id="save-as-btn" class="px-4 py-2 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                                <i class="fas fa-save mr-2"></i>Save As
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="editor-container" class="flex-1 rounded-lg bg-surface p-6 overflow-hidden">
+                        <div id="note-editor" class="note-editor h-full overflow-y-auto" contenteditable="true" spellcheck="true"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Import Modal -->
+    <div id="import-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md mx-auto mt-20 bg-surface rounded-2xl shadow-2xl border border-white/10 p-6 transform transition-all duration-300 ease-out scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Import Note</h2>
+                <button class="close-modal-btn text-text-secondary hover:text-text transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Select File</label>
+                <input type="file" id="import-file" accept=".txt,.md,.docx,.pdf" class="w-full p-2 rounded-lg bg-background border border-white/10">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Title</label>
+                <input type="text" id="import-title" class="w-full p-2 rounded-lg bg-background border border-white/10">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">Tag</label>
+                <input type="text" id="import-tag" class="w-full p-2 rounded-lg bg-background border border-white/10">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-import" class="px-4 py-2 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                    Cancel
+                </button>
+                <button id="confirm-import" class="px-4 py-2 rounded-lg bg-accent hover:bg-opacity-90 transition-all">
+                    Import
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Save As Modal -->
+    <div id="save-as-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md mx-auto mt-20 bg-surface rounded-2xl shadow-2xl border border-white/10 p-6 transform transition-all duration-300 ease-out scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Save As</h2>
+                <button class="close-modal-btn text-text-secondary hover:text-text transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">Format</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="format-btn px-4 py-3 rounded-lg bg-background hover:bg-white/5 transition-all" data-format="txt">.txt</button>
+                    <button class="format-btn px-4 py-3 rounded-lg bg-background hover:bg-white/5 transition-all" data-format="md">.md</button>
+                    <button class="format-btn px-4 py-3 rounded-lg bg-background/50 hover:bg-white/5 transition-all opacity-50 cursor-not-allowed relative" data-format="pdf">
+                        .pdf
+                        <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs bg-accent text-white px-2 py-1 rounded-full">Coming Soon</span>
+                    </button>
+                    <button class="format-btn px-4 py-3 rounded-lg bg-background/50 hover:bg-white/5 transition-all opacity-50 cursor-not-allowed relative" data-format="docx">
+                        .docx
+                        <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs bg-accent text-white px-2 py-1 rounded-full">Coming Soon</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-save-as" class="px-4 py-2 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Note Modal -->
+    <div id="new-note-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md mx-auto mt-20 bg-surface rounded-2xl shadow-2xl border border-white/10 p-6 transform transition-all duration-300 ease-out scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">New Note</h2>
+                <button class="close-modal-btn text-text-secondary hover:text-text transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Title</label>
+                <input type="text" id="new-note-title" class="w-full p-2 rounded-lg bg-background border border-white/10">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">Tag</label>
+                <input type="text" id="new-note-tag" class="w-full p-2 rounded-lg bg-background border border-white/10">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-new-note" class="px-4 py-2 rounded-lg bg-surface hover:bg-white/5 transition-all">
+                    Cancel
+                </button>
+                <button id="confirm-new-note" class="px-4 py-2 rounded-lg bg-accent hover:bg-opacity-90 transition-all">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script type="module" src="../../js/theme.js"></script>
+    <script type="module" src="../../js/components/sidebar.js"></script>
+    <script type="module" src="../../js/components/alerts.js"></script>
+    <script type="module" src="../../js/utils/storage.js"></script>
+    <script type="module" src="notes.js"></script>
+</body>
+</html>  

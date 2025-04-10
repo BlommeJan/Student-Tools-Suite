@@ -12,6 +12,11 @@ export function initializeAlerts() {
 }
 
 export function showAlert(message, type = 'info', duration = 3000) {
+    // Initialize alerts if not already done
+    if (!alertContainer) {
+        initializeAlerts();
+    }
+    
     const alert = document.createElement('div');
     alert.className = `alert p-4 rounded-lg shadow-lg transform transition-all duration-300 ${getAlertClass(type)} backdrop-blur-glass`;
     alert.innerHTML = `
@@ -56,4 +61,4 @@ function getAlertIcon(type) {
         info: '<i class="fas fa-info-circle text-blue-500 dark:text-blue-300"></i>'
     };
     return icons[type] || icons.info;
-}  
+} 
