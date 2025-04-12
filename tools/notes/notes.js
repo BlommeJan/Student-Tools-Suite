@@ -526,7 +526,7 @@ function deleteNote(noteId) {
     setItem(NOTES_LIST_KEY, notesList);
     
     // Remove content
-    removeItem(`${NOTE_CONTENT_KEY}${noteId}`);
+    removeItem(`${NOTE_CONTENT_PREFIX}${noteId}`);
     
     // If current note is deleted, show dashboard
     if (currentNoteId === noteId) {
@@ -877,4 +877,55 @@ function initializeEditor() {
     noteEditor.addEventListener('blur', () => {
         noteEditor.classList.remove('focused');
     });
+}
+
+// Handle note actions
+function handleNoteAction(action, noteId) {
+    const note = notesList.find(n => n.id === noteId);
+    if (!note) return;
+
+    switch (action) {
+        case 'view':
+            currentNoteId = noteId;
+            showEditor();
+            break;
+        case 'edit':
+            openEditModal(note);
+            break;
+        case 'delete':
+            if (confirm('Are you sure you want to delete this note?')) {
+                deleteNote(noteId);
+            }
+            break;
+    }
+}
+
+// Open edit modal
+function openEditModal(note) {
+    document.getElementById('editNoteTitle').value = note.title;
+    document.getElementById('editNoteTag').value = note.tag;
+    document.getElementById('editNoteModal').dataset.noteId = note.id;
+    openModal('editNoteModal');
+}
+
+// Save note edit
+function saveNoteEdit() {
+    const modal = document.getElementById('editNoteModal');
+    const noteId = modal.dataset.noteId;
+    const title = document.getElementById('editNoteTitle').value.trim();
+    const tag = document.getElementById('editNoteTag').value.trim();
+
+    if (!title) {
+        alert('Please enter a title');
+        return;
+    }
+
+    const note = notesList.find(n => n.id === noteId);
+    if (note) {
+        note.title = title;
+        note.tag = tag;
+        saveNotes();
+        renderNotes();
+        closeModal('editNoteModal');
+    }
 }  

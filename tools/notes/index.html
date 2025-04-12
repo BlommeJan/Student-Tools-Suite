@@ -323,6 +323,64 @@
             border-left-color: var(--accent-color);
             background-color: var(--surface-color);
         }
+
+        /* Alert styles */
+        .alert {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .alert-error {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .alert-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .alert-info {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .alert .close-btn {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .alert .close-btn:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-background text-text min-h-screen">
@@ -555,6 +613,32 @@
                 <button id="confirm-new-note" class="px-4 py-2 rounded-lg bg-accent hover:bg-opacity-90 transition-all">
                     Create
                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Note Modal -->
+    <div id="editNoteModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-text">Edit Note</h2>
+                <button class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="editNoteTitle" class="block text-sm font-medium text-text-secondary mb-1">Title</label>
+                    <input type="text" id="editNoteTitle" class="w-full px-3 py-2 bg-background border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent">
+                </div>
+                <div>
+                    <label for="editNoteTag" class="block text-sm font-medium text-text-secondary mb-1">Tag</label>
+                    <input type="text" id="editNoteTag" class="w-full px-3 py-2 bg-background border border-border rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button class="px-4 py-2 bg-surface hover:bg-background text-text rounded-md transition-colors" onclick="closeModal('editNoteModal')">Cancel</button>
+                    <button class="px-4 py-2 bg-accent hover:bg-accent/80 text-white rounded-md transition-colors" onclick="saveNoteEdit()">Save</button>
+                </div>
             </div>
         </div>
     </div>
